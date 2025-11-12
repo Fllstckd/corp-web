@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>Karir di Superbank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <script>
+        // Konfigurasi Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-lime': '#C5F946',
+                        'brand-green': '#00D563',
+                        'brand-dark': '#0A0A0A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            },
+        }
+    </script>
+    <style>
+        body{
+                background: #091618;
+        }
+        /* Custom CSS untuk gambar latar belakang */
+        .hero-background {
+            background-size: cover;
+            /* background-position: center; */
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center; /* Konten di tengah vertikal */
+            min-height: 85vh; /* Tinggi minimal */
+            position: relative;
+        }
+        /* Overlay gelap agar teks terbaca */
+        .hero-background::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Gradient overlay dari sedikit gelap ke lebih gelap di bawah */
+            background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1));
+            z-index: 1;
+        }
+        /* Konten di atas overlay */
+        .hero-content {
+            position: relative;
+            z-index: 2; 
+        }
+
+        /* Style Dropdown Sederhana (Hanya Hover) */
+        .dropdown-menu { display: none; }
+        .dropdown:hover .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="font-sans text-brand-dark">
+
+    <header class="border-b border-gray-200 sticky top-0 z-50" style="background-color: #003539; color: #afee00;">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex flex-col">
+                    <span class="font-bold text-2xl" style="color: #00D563;">superbank</span>
+                    <span class="text-xs text-gray-500 -mt-1" style="color: #afee00;">Bagian dari Grab</span>
+                </a>
+
+                <ul id="navbar-links" class="hidden md:flex items-center gap-6">
+                    <li><a href="#" class="text-sm font-medium" style="color: #afee00;">Memuat...</a></li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="#" class="bg-brand-dark px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800" style="color: #afee00;">
+                    Download App
+                </a>
+                <a href="#" class="text-sm font-medium flex items-center gap-1 text-gray-600" style="color: #afee00;">
+                    <i data-lucide="globe" class="w-4 h-4"></i> EN
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    
+    <main>
+        <section id="hero-section" class="hero-background text-white">
+            <div class="container mx-auto px-6 text-center max-w-4xl hero-content">
+                
+                <h1 id="career-title" class="text-4xl md:text-6xl font-bold leading-tight mb-4 text-brand-lime" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                    Memuat Judul...
+                </h1>
+                
+                <p id="career-description" class="text-lg md:text-xl text-white leading-relaxed mb-8" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
+                    Memuat deskripsi...
+                </p>
+                
+                <a href="job-list.html" 
+                   class="inline-block bg-brand-lime text-brand-dark px-8 py-3 rounded-full font-semibold text-lg hover:bg-opacity-80 transition-colors duration-300">
+                    Explore Career
+                </a>
+            </div>
+        </section>
+        
+        </main>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8 mt-16">
+        <div class="container mx-auto px-6"><p class="text-xs text-gray-500 text-center">Copyright © 2024 PT Super Bank Indonesia.</p></div>
+    </footer>
+
+    <script> lucide.createIcons(); </script>
+
+    <script>
+        // const STRAPI_URL = "https://fabulous-happiness-c8e0dac576.strapiapp.com";
+        const STRAPI_URL = "http://localhost:1337";
+
+        function getStrapiMedia(media) {
+            // Mengharapkan SATU OBJEK media, bukan array
+            if (!media || !media.url) {
+                return "https://placehold.co/1920x1080/0A0A0A/cccccc?text=No+Image"; 
+            }
+            return media.url.startsWith('/') ? `${STRAPI_URL}${media.url}` : media.url;
+        }
+
+        async function fetchCareerPage() {
+            try {
+                // Tetap pakai populate=*
+                const response = await fetch(`${STRAPI_URL}/api/career-page?populate=*`);
+                if (!response.ok) throw new Error("Gagal mengambil data Halaman Karir");
+                
+                const responseData = await response.json();
+                const careerPage = responseData.data; 
+
+                if (careerPage) {
+                    document.getElementById('career-title').innerText = careerPage.title || "Bergabunglah dengan Tim Kami";
+                    document.getElementById('career-description').innerText = careerPage.description || "";
+                    
+                    const heroSection = document.getElementById('hero-section');
+                    
+                    // Cek jika header_image adalah array (Multiple Media) dan ada isinya
+                    if (careerPage.header_image && Array.isArray(careerPage.header_image) && careerPage.header_image.length > 0) {
+                        // Ambil gambar pertama dari array
+                        heroSection.style.backgroundImage = `url('${getStrapiMedia(careerPage.header_image[0])}')`;
+                    } 
+                    // Fallback jika bukan array (Single Media)
+                    else if (careerPage.header_image) {
+                        heroSection.style.backgroundImage = `url('${getStrapiMedia(careerPage.header_image)}')`;
+                    }
+                    else {
+                        // Fallback jika tidak ada gambar sama sekali
+                        heroSection.style.backgroundColor = '#0A0A0A'; // brand-dark
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('career-title').innerText = "Gagal memuat Halaman Karir";
+                document.getElementById('hero-section').style.backgroundColor = '#0A0A0A'; // Fallback background
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", fetchCareerPage);
+        // Di dalam script fetch Anda:
+        const STRAPI_URL1 = "http://localhost:1337";
+        async function fetchGlobalData() {
+            try {
+                // 
+                // --- INI PERBAIKANNYA ---
+                //
+                // URL LAMA yang GAGAL:
+                // const response = await fetch(`${STRAPI_URL}/api/global?populate=deep`);
+                //
+                // URL BARU yang BENAR:
+                const response = await fetch(`${STRAPI_URL1}/api/global?populate[navigation_links][populate]=sub_links`);
+                //
+                // --- BATAS PERBAIKAN ---
+                // 
+
+                if (!response.ok) throw new Error("Gagal ambil data global");
+                
+                const responseData = await response.json();
+                const globalData = responseData.data;
+
+                // Temukan kontainer navbar Anda (Anda perlu ID ini di HTML)
+                const navContainer = document.getElementById("navbar-links"); 
+                
+                // Cek jika globalData dan navContainer ada
+                if (globalData && navContainer) {
+                    navContainer.innerHTML = ""; // Kosongkan
+                    
+                    // Loop data navigasi dan buat HTML-nya
+                    globalData.navigation_links.forEach(navLink => {
+                        let linkHTML = "";
+                        
+                        // Cek jika punya sub_links (untuk dropdown)
+                        if (navLink.sub_links && navLink.sub_links.length > 0) {
+                            // Buat HTML untuk dropdown
+                            // (Pastikan kelas CSS "dropdown", "dropdown-menu" sudah Anda atur)
+                            linkHTML = `
+                                <li class="relative dropdown">
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime flex items-center">
+                                        ${navLink.label} <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            `;
+                            
+                            navLink.sub_links.forEach(subLink => {
+                                linkHTML += `<a href="${subLink.url}" class="block px-4 py-2 text-sm text-brand-dark hover:bg-gray-100">${subLink.label}</a>`;
+                            });
+                            
+                            linkHTML += `</div></li>`;
+                            
+                        } else {
+                            // Buat HTML untuk link biasa
+                            linkHTML = `
+                                <li>
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime">${navLink.label}</a>
+                                </li>
+                            `;
+                        }
+                        
+                        navContainer.innerHTML += linkHTML;
+                    });
+
+                    // Panggil lucide.createIcons() lagi setelah menambah HTML baru
+                    lucide.createIcons();
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat navigasi:", error);
+            }
+        }
+
+        // Panggil fungsi ini saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchGlobalData);
+    </script>
+</body>
+</html>

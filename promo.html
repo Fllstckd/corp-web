@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promo - Superbank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+             theme: {
+                extend: {
+                    colors: {
+                        'brand-lime': '#C5F946',
+                        'brand-green': '#00D563',
+                        'brand-dark': '#0A0A0A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            },
+        }
+    </script>
+</head>
+<body class="font-sans text-brand-dark flex flex-col min-h-screen">
+
+    <header class="border-b border-gray-200 sticky top-0 z-50" style="background-color: #003539; color: #afee00;">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex flex-col">
+                    <span class="font-bold text-2xl" style="color: #00D563;">superbank</span>
+                    <span class="text-xs text-gray-500 -mt-1" style="color: #afee00;">Bagian dari Grab</span>
+                </a>
+
+                <ul id="navbar-links" class="hidden md:flex items-center gap-6">
+                    <li><a href="#" class="text-sm font-medium" style="color: #afee00;">Memuat...</a></li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="#" class="bg-brand-dark px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800" style="color: #afee00;">
+                    Download App
+                </a>
+                <a href="#" class="text-sm font-medium flex items-center gap-1 text-gray-600" style="color: #afee00;">
+                    <i data-lucide="globe" class="w-4 h-4"></i> EN
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <div class="w-full h-64 lg:h-80">
+            <img id="promo-header-image" 
+                 src="https://placehold.co/1920x400/e2e8f0/cccccc?text=Loading+Header" 
+                 alt="Promo Superbank" 
+                 class="w-full h-full object-cover">
+        </div>
+        
+        <div class="container mx-auto px-6 py-12">
+            <div class="mb-8">
+                <p class="text-sm text-gray-500">Beranda / Promo</p>
+                <h1 id="promo-title" class="text-4xl font-bold text-brand-dark mt-2">Promo</h1>
+                <p id="promo-description" class="text-lg text-gray-600 mt-2">Banyak pilihan promo buat kamu yang mau untung terus!</p>
+            </div>
+            
+            <div id="promo-list-container" class="grid md:grid-cols-3 gap-8">
+                <p class="text-gray-600">Memuat promo...</p>
+                
+                </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-6"><p class="text-xs text-gray-500 text-center">Copyright © 2024 PT Super Bank Indonesia.</p></div>
+    </footer>
+
+    <script> lucide.createIcons(); </script>
+
+    <script>
+        const STRAPI_URL = "http://localhost:1337";
+
+        // Helper media
+        function getStrapiMedia(media) {
+            if (!media || !media.url) return "https://placehold.co/800x400/e2e8f0/cccccc?text=No+Image";
+            return media.url.startsWith('/') ? `${STRAPI_URL}${media.url}` : media.url;
+        }
+
+        // 1. Fetch data untuk Halaman Promo (Single Type)
+        async function fetchPromoPage() {
+            try {
+                const response = await fetch(`${STRAPI_URL}/api/promo-page?populate=*`);
+                if (!response.ok) throw new Error("Gagal ambil data Promo Page");
+                
+                const responseData = await response.json();
+                const pageData = responseData.data;
+
+                if (pageData) {
+                    document.getElementById('promo-title').innerText = pageData.title || "Promo";
+                    document.getElementById('promo-description').innerText = pageData.description || "Banyak pilihan promo...";
+                    
+                    // Ingat: header_image adalah Multiple Media, kita ambil yg pertama [0]
+                    if (pageData.header_image && pageData.header_image.length > 0) {
+                        document.getElementById('promo-header-image').src = getStrapiMedia(pageData.header_image[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error Halaman Promo:", error);
+            }
+        }
+
+        // 2. Fetch data untuk Daftar Promo (Collection Type)
+        async function fetchPromoList() {
+            const container = document.getElementById('promo-list-container');
+            container.innerHTML = '<p class="text-gray-600">Memuat promo...</p>'; // Set loading
+
+            try {
+                // Panggil API 'promos' dan populate 'banner'
+                const response = await fetch(`${STRAPI_URL}/api/promos?populate=banner`);
+                if (!response.ok) throw new Error("Gagal ambil data Promo List. Cek Izin API.");
+                
+                const responseData = await response.json();
+                const promos = responseData.data;
+
+                container.innerHTML = ""; // Kosongkan kontainer
+
+                if (promos && promos.length > 0) {
+                    promos.forEach(promo => {
+                        const card = document.createElement('div');
+                        card.className = "rounded-lg overflow-hidden shadow-lg border border-gray-100 flex flex-col";
+                        
+                        // 'banner' adalah field media, 'title' adalah text
+                        // Pastikan Anda SUDAH MENAMBAH 'slug'
+                        card.innerHTML = `
+                            <img src="${getStrapiMedia(promo.banner)}" alt="${promo.title || 'Promo'}" class="w-full h-40 object-cover">
+                            <div class="p-4 flex flex-col flex-grow">
+                                <h3 class="text-lg font-bold flex-grow">${promo.title || 'Promo Spesial'}</h3>
+                                <a href="promo-detail.html?slug=${promo.slug}" class="inline-block mt-4 text-brand-green font-semibold">Lihat Detail</a>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-gray-600">Belum ada promo saat ini.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error Daftar Promo:", error);
+                container.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+            }
+        }
+
+        // Jalankan kedua fungsi saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchPromoPage();
+            fetchPromoList();
+        });
+
+        async function fetchGlobalData() {
+            try {
+                // 
+                // --- INI PERBAIKANNYA ---
+                //
+                // URL LAMA yang GAGAL:
+                // const response = await fetch(`${STRAPI_URL}/api/global?populate=deep`);
+                //
+                // URL BARU yang BENAR:
+                const response = await fetch(`${STRAPI_URL}/api/global?populate[navigation_links][populate]=sub_links`);
+                //
+                // --- BATAS PERBAIKAN ---
+                // 
+
+                if (!response.ok) throw new Error("Gagal ambil data global");
+                
+                const responseData = await response.json();
+                const globalData = responseData.data;
+
+                // Temukan kontainer navbar Anda (Anda perlu ID ini di HTML)
+                const navContainer = document.getElementById("navbar-links"); 
+                
+                // Cek jika globalData dan navContainer ada
+                if (globalData && navContainer) {
+                    navContainer.innerHTML = ""; // Kosongkan
+                    
+                    // Loop data navigasi dan buat HTML-nya
+                    globalData.navigation_links.forEach(navLink => {
+                        let linkHTML = "";
+                        
+                        // Cek jika punya sub_links (untuk dropdown)
+                        if (navLink.sub_links && navLink.sub_links.length > 0) {
+                            // Buat HTML untuk dropdown
+                            // (Pastikan kelas CSS "dropdown", "dropdown-menu" sudah Anda atur)
+                            linkHTML = `
+                                <li class="relative dropdown">
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime flex items-center">
+                                        ${navLink.label} <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            `;
+                            
+                            navLink.sub_links.forEach(subLink => {
+                                linkHTML += `<a href="${subLink.url}" class="block px-4 py-2 text-sm text-brand-dark hover:bg-gray-100">${subLink.label}</a>`;
+                            });
+                            
+                            linkHTML += `</div></li>`;
+                            
+                        } else {
+                            // Buat HTML untuk link biasa
+                            linkHTML = `
+                                <li>
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime">${navLink.label}</a>
+                                </li>
+                            `;
+                        }
+                        
+                        navContainer.innerHTML += linkHTML;
+                    });
+
+                    // Panggil lucide.createIcons() lagi setelah menambah HTML baru
+                    lucide.createIcons();
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat navigasi:", error);
+            }
+        }
+
+        // Panggil fungsi ini saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchGlobalData);
+    </script>
+</body>
+</html>

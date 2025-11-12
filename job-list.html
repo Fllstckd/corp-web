@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lowongan - Superbank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+             theme: {
+                extend: {
+                    colors: {
+                        'brand-lime': '#C5F946',
+                        'brand-green': '#00D563',
+                        'brand-dark': '#0A0A0A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            },
+        }
+    </script>
+</head>
+<body class="font-sans text-brand-dark flex flex-col min-h-screen">
+
+    <header class="border-b border-gray-200 sticky top-0 z-50" style="background-color: #003539; color: #afee00;">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex flex-col">
+                    <span class="font-bold text-2xl" style="color: #00D563;">superbank</span>
+                    <span class="text-xs text-gray-500 -mt-1" style="color: #afee00;">Bagian dari Grab</span>
+                </a>
+
+                <ul id="navbar-links" class="hidden md:flex items-center gap-6">
+                    <li><a href="#" class="text-sm font-medium" style="color: #afee00;">Memuat...</a></li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="#" class="bg-brand-dark px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800" style="color: #afee00;">
+                    Download App
+                </a>
+                <a href="#" class="text-sm font-medium flex items-center gap-1 text-gray-600" style="color: #afee00;">
+                    <i data-lucide="globe" class="w-4 h-4"></i> EN
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-16 max-w-4xl flex-grow">
+        <h1 class="text-4xl md:text-5xl font-bold text-brand-dark mb-12">Lowongan Tersedia</h1>
+
+        <div id="job-list-container" class="space-y-6">
+            <p id="loading-message" class="text-gray-600">Memuat lowongan...</p>
+        </div>
+    </main>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-6"><p class="text-xs text-gray-500 text-center">Copyright © 2024 PT Super Bank Indonesia.</p></div>
+    </footer>
+
+    <script> lucide.createIcons(); </script>
+
+    <script>
+        // const STRAPI_URL = "https://fabulous-happiness-c8e0dac576.strapiapp.com";
+        const STRAPI_URL = "http://localhost:1337";
+
+
+        async function fetchJobs() {
+            const container = document.getElementById('job-list-container');
+            const loadingMsg = document.getElementById('loading-message');
+
+            try {
+                // Panggil API 'jobs' (Collection Type)
+                const response = await fetch(`${STRAPI_URL}/api/jobs`);
+                if (!response.ok) throw new Error("Gagal mengambil data Lowongan. Cek Izin API.");
+                
+                const responseData = await response.json();
+                const jobs = responseData.data;
+
+                // Kosongkan pesan loading
+                loadingMsg.style.display = 'none';
+
+                if (jobs && jobs.length > 0) {
+                    jobs.forEach(job => {
+                        const card = document.createElement('a');
+                        // Link ke job-detail.html dengan slug
+                        card.href = `job-detail.html?slug=${job.slug}`; 
+                        card.className = "block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow";
+                        
+                        // Menggunakan field 'title', 'type', dan 'location' dari Strapi Anda
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-bold text-brand-dark">${job.title || 'Judul Lowongan'}</h3>
+                                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">${job.type || 'Full-time'}</span>
+                            </div>
+                            <p class="text-gray-600 mt-2">${job.location || 'Lokasi'}</p>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-gray-600">Saat ini belum ada lowongan tersedia.</p>';
+                }
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", fetchJobs);
+        // Di dalam script fetch Anda:
+        const STRAPI_URL1 = "http://localhost:1337";
+        async function fetchGlobalData() {
+            try {
+                // 
+                // --- INI PERBAIKANNYA ---
+                //
+                // URL LAMA yang GAGAL:
+                // const response = await fetch(`${STRAPI_URL}/api/global?populate=deep`);
+                //
+                // URL BARU yang BENAR:
+                const response = await fetch(`${STRAPI_URL1}/api/global?populate[navigation_links][populate]=sub_links`);
+                //
+                // --- BATAS PERBAIKAN ---
+                // 
+
+                if (!response.ok) throw new Error("Gagal ambil data global");
+                
+                const responseData = await response.json();
+                const globalData = responseData.data;
+
+                // Temukan kontainer navbar Anda (Anda perlu ID ini di HTML)
+                const navContainer = document.getElementById("navbar-links"); 
+                
+                // Cek jika globalData dan navContainer ada
+                if (globalData && navContainer) {
+                    navContainer.innerHTML = ""; // Kosongkan
+                    
+                    // Loop data navigasi dan buat HTML-nya
+                    globalData.navigation_links.forEach(navLink => {
+                        let linkHTML = "";
+                        
+                        // Cek jika punya sub_links (untuk dropdown)
+                        if (navLink.sub_links && navLink.sub_links.length > 0) {
+                            // Buat HTML untuk dropdown
+                            // (Pastikan kelas CSS "dropdown", "dropdown-menu" sudah Anda atur)
+                            linkHTML = `
+                                <li class="relative dropdown">
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime flex items-center">
+                                        ${navLink.label} <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            `;
+                            
+                            navLink.sub_links.forEach(subLink => {
+                                linkHTML += `<a href="${subLink.url}" class="block px-4 py-2 text-sm text-brand-dark hover:bg-gray-100">${subLink.label}</a>`;
+                            });
+                            
+                            linkHTML += `</div></li>`;
+                            
+                        } else {
+                            // Buat HTML untuk link biasa
+                            linkHTML = `
+                                <li>
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime">${navLink.label}</a>
+                                </li>
+                            `;
+                        }
+                        
+                        navContainer.innerHTML += linkHTML;
+                    });
+
+                    // Panggil lucide.createIcons() lagi setelah menambah HTML baru
+                    lucide.createIcons();
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat navigasi:", error);
+            }
+        }
+
+        // Panggil fungsi ini saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchGlobalData);
+    </script>
+</body>
+</html>

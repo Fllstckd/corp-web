@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Artikel</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-lime': '#C5F946',
+                        'brand-green': '#00D563',
+                        'brand-dark': '#0A0A0A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            },
+        }
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+</head>
+<body class="font-sans text-brand-dark">
+
+    <header class="border-b border-gray-200 sticky top-0 z-50" style="background-color: #003539; color: #afee00;">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex flex-col">
+                    <span class="font-bold text-2xl" style="color: #00D563;">superbank</span>
+                    <span class="text-xs text-gray-500 -mt-1" style="color: #afee00;">Bagian dari Grab</span>
+                </a>
+
+                <ul id="navbar-links" class="hidden md:flex items-center gap-6">
+                    <li><a href="#" class="text-sm font-medium" style="color: #afee00;">Memuat...</a></li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="#" class="bg-brand-dark px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800" style="color: #afee00;">
+                    Download App
+                </a>
+                <a href="#" class="text-sm font-medium flex items-center gap-1 text-gray-600" style="color: #afee00;">
+                    <i data-lucide="globe" class="w-4 h-4"></i> EN
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 max-w-4xl">
+        
+        <h1 id="article-title" class="text-4xl md:text-5xl font-bold text-brand-dark leading-tight">
+            Memuat judul artikel...
+        </h1>
+        
+        <div class="flex items-center gap-4 mt-4 text-gray-600">
+            <span id="article-author">Oleh ...</span>
+            <span class="text-gray-300">|</span>
+            <span id="article-category" class="font-semibold text-brand-green">...</span>
+        </div>
+
+        <img id="article-cover" 
+             src="https://placehold.co/1000x500/e2e8f0/cccccc?text=Loading+Image" 
+             alt="Memuat gambar" 
+             class="w-full h-auto md:h-96 object-cover rounded-lg my-8 bg-gray-100">
+        
+        <div id="article-content-blocks" class="max-w-none">
+            <p>Memuat konten artikel...</p>
+        </div>
+
+    </main>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8 mt-16">
+        <div class="container mx-auto px-6"><p class="text-xs text-gray-500 text-center">Copyright © 2024 PT Super Bank Indonesia.</p></div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <script>
+        // URL backend Strapi LIVE Anda
+        const STRAPI_URL = "https://fabulous-happiness-c8e0dac576.strapiapp.com";
+        // const STRAPI_URL = "http://localhost:1337";
+
+        /**
+         * Fungsi getStrapiMedia (Sudah benar)
+         */
+        function getStrapiMedia(media) {
+            if (!media || !media.url) {
+                // Beri placeholder berbeda untuk media di dalam artikel
+                return "https://placehold.co/800x400/e2e8f0/cccccc?text=Media";
+            }
+            const { url } = media;
+            return url.startsWith('/') ? `${STRAPI_URL}${url}` : url;
+        }
+
+        /**
+         * Fungsi fetchSingleArticle (DIPERBARUI DENGAN NAMA KOMPONEN YANG BENAR)
+         */
+        async function fetchSingleArticle() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+
+            const titleEl = document.getElementById('article-title');
+            const authorEl = document.getElementById('article-author');
+            const categoryEl = document.getElementById('article-category');
+            const coverEl = document.getElementById('article-cover');
+            const contentEl = document.getElementById('article-content-blocks');
+
+            if (!slug) {
+                titleEl.innerText = "Error: Artikel tidak ditemukan (slug tidak ada).";
+                return;
+            }
+
+            try {
+                const apiUrl = `${STRAPI_URL}/api/articles?filters[slug][$eq]=${slug}&populate=*`;
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const responseData = await response.json();
+                const article = responseData.data[0]; 
+                
+                if (!article) {
+                     throw new Error("Artikel tidak ditemukan dengan slug ini.");
+                }
+
+                // Mengisi data (Ini sudah bekerja di tempat Anda)
+                titleEl.innerText = article.title;
+                coverEl.src = getStrapiMedia(article.cover);
+                coverEl.alt = article.title;
+                authorEl.innerText = article.author ? `Oleh ${article.author.username || 'Tim Superbank'}` : `Oleh Tim Superbank`;
+                categoryEl.innerText = article.category ? article.category.name : '';
+                if (!article.category) categoryEl.style.display = 'none';
+
+                
+                // 
+                // --- PERUBAHAN UTAMA DI SINI ---
+                // 
+                // 6. Render DYNAMIC ZONE (Blocks)
+                contentEl.innerHTML = ""; // Kosongkan "Loading..."
+                
+                // (Log ini yang memberi kita jawaban)
+                console.log("Data Blocks dari Strapi:", article.blocks);
+
+                if (article.blocks && article.blocks.length > 0) {
+                    
+                    article.blocks.forEach(block => {
+                        
+                        // Menggunakan nama komponen yang benar dari console Anda
+                        const componentName = block.__component;
+
+                        // 1. Handle 'Rich text'
+                        // NAMA BARU: 'shared.rich-text'
+                        if (componentName === 'shared.rich-text') {
+                            if (block.body) {
+                                // Kita bungkus dengan 'prose' agar rapi
+                                contentEl.innerHTML += `<div class="prose lg:prose-xl max-w-none mb-6">${block.body}</div>`;
+                            }
+                        } 
+                        
+                        // 2. Handle 'Quote'
+                        // NAMA BARU: 'shared.quote'
+                        else if (componentName === 'shared.quote') {
+                            // (Saya tebak field-nya 'text' and 'author_name')
+                            if (block.text) {
+                                contentEl.innerHTML += `
+                                    <blockquote class="border-l-4 border-brand-green bg-gray-50 p-6 italic text-xl my-8">
+                                        <p>"${block.text}"</p>
+                                        <footer class="text-base not-italic text-gray-600 mt-2">
+                                            — ${block.author_name || 'Anonim'}
+                                        </footer>
+                                    </blockquote>
+                                `;
+                            }
+                        }
+                        
+                        // 3. Handle 'Media'
+                        // NAMA BARU: 'shared.media'
+                        else if (componentName === 'shared.media') {
+                            // (Saya tebak field-nya 'file')
+                            if (block.file) {
+                                contentEl.innerHTML += `
+                                    <figure class="my-8">
+                                        <img src="${getStrapiMedia(block.file)}" alt="${block.file.alternativeText || 'Media'}" class="w-full rounded-lg shadow-md">
+                                        <figcaption class="text-sm text-center text-gray-500 mt-2 italic">
+                                            ${block.file.caption || ''}
+                                        </figcaption>
+                                    </figure>
+                                `;
+                            }
+                        }
+
+                        // 4. Handle 'Slider'
+                        // NAMA BARU: 'shared.slider'
+                        else if (componentName === 'shared.slider') {
+                            // (Saya tebak field-nya 'files')
+                            if (block.files && block.files.length > 0) {
+                                let sliderHTML = '<div class="my-8 grid grid-cols-2 gap-4">';
+                                // Loop semua gambar di slider
+                                block.files.forEach(file => {
+                                    sliderHTML += `<img src="${getStrapiMedia(file)}" alt="" class="w-full rounded-lg shadow-md">`;
+                                });
+                                sliderHTML += '</div>';
+                                contentEl.innerHTML += sliderHTML;
+                            }
+                        }
+                        
+                        // 5. Handle block yang tidak dikenal
+                        else {
+                            console.warn("Block component tidak dikenal:", componentName);
+                        }
+                    });
+
+                } else {
+                    // Fallback jika 'blocks' kosong
+                    contentEl.innerHTML = `<p>${article.description}</p>`;
+                }
+                // --- BATAS PERUBAHAN ---
+                // 
+
+            } catch (error) {
+                console.error("Gagal fetch artikel:", error);
+                titleEl.innerText = "Gagal memuat artikel.";
+                contentEl.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+            }
+        }
+
+        // Jalankan fungsi saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchSingleArticle);
+        // Di dalam script fetch Anda:
+        const STRAPI_URL1 = "http://localhost:1337";
+        async function fetchGlobalData() {
+            try {
+                // 
+                // --- INI PERBAIKANNYA ---
+                //
+                // URL LAMA yang GAGAL:
+                // const response = await fetch(`${STRAPI_URL}/api/global?populate=deep`);
+                //
+                // URL BARU yang BENAR:
+                const response = await fetch(`${STRAPI_URL1}/api/global?populate[navigation_links][populate]=sub_links`);
+                //
+                // --- BATAS PERBAIKAN ---
+                // 
+
+                if (!response.ok) throw new Error("Gagal ambil data global");
+                
+                const responseData = await response.json();
+                const globalData = responseData.data;
+
+                // Temukan kontainer navbar Anda (Anda perlu ID ini di HTML)
+                const navContainer = document.getElementById("navbar-links"); 
+                
+                // Cek jika globalData dan navContainer ada
+                if (globalData && navContainer) {
+                    navContainer.innerHTML = ""; // Kosongkan
+                    
+                    // Loop data navigasi dan buat HTML-nya
+                    globalData.navigation_links.forEach(navLink => {
+                        let linkHTML = "";
+                        
+                        // Cek jika punya sub_links (untuk dropdown)
+                        if (navLink.sub_links && navLink.sub_links.length > 0) {
+                            // Buat HTML untuk dropdown
+                            // (Pastikan kelas CSS "dropdown", "dropdown-menu" sudah Anda atur)
+                            linkHTML = `
+                                <li class="relative dropdown">
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime flex items-center">
+                                        ${navLink.label} <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            `;
+                            
+                            navLink.sub_links.forEach(subLink => {
+                                linkHTML += `<a href="${subLink.url}" class="block px-4 py-2 text-sm text-brand-dark hover:bg-gray-100">${subLink.label}</a>`;
+                            });
+                            
+                            linkHTML += `</div></li>`;
+                            
+                        } else {
+                            // Buat HTML untuk link biasa
+                            linkHTML = `
+                                <li>
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime">${navLink.label}</a>
+                                </li>
+                            `;
+                        }
+                        
+                        navContainer.innerHTML += linkHTML;
+                    });
+
+                    // Panggil lucide.createIcons() lagi setelah menambah HTML baru
+                    lucide.createIcons();
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat navigasi:", error);
+            }
+        }
+
+        // Panggil fungsi ini saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchGlobalData);
+    </script>
+
+</body>
+</html>

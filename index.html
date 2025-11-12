@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superbank Homepage - Data dari Strapi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-lime': '#C5F946',
+                        'brand-green': '#00D563',
+                        'brand-dark': '#0A0A0A',
+                        'brand-light-green': '#F0FDF4',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-brand-dark">
+
+    <header class="border-b border-gray-200 sticky top-0 z-50" style="background-color: #003539; color: #afee00;">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-10">
+                <a href="index.html" class="flex flex-col">
+                    <span class="font-bold text-2xl" style="color: #00D563;">superbank</span>
+                    <span class="text-xs text-gray-500 -mt-1" style="color: #afee00;">Bagian dari Grab</span>
+                </a>
+
+                <ul id="navbar-links" class="hidden md:flex items-center gap-6">
+                    <li><a href="#" class="text-sm font-medium" style="color: #afee00;">Memuat...</a></li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="#" class="bg-brand-dark px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800" style="color: #afee00;">
+                    Download App
+                </a>
+                <a href="#" class="text-sm font-medium flex items-center gap-1 text-gray-600" style="color: #afee00;">
+                    <i data-lucide="globe" class="w-4 h-4"></i> EN
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="bg-brand-lime pt-20 pb-12 relative overflow-hidden">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="max-w-md">
+                    <h1 class="text-7xl font-bold text-brand-dark leading-tight">Pake BI-Fast!</h1>
+                    <p class="text-3xl font-medium text-brand-dark mt-2">Top up saldo jadi lebih murah*</p>
+                    <a href="#" class="inline-block bg-brand-dark text-white px-6 py-3 rounded-full font-semibold mt-6 hover:bg-gray-800">
+                        Cek Detailnya Disini!
+                    </a>
+                </div>
+                <div class="mt-20 flex items-center gap-6">
+                    <span class="text-sm font-medium">Superbank bagian dari</span>
+                    <img src="https://placehold.co/80x20/cccccc/999999?text=Grab" alt="Grab" class="h-5" style="background-color: #003539;">
+                    <img src="https://placehold.co/80x20/cccccc/999999?text=Emtek" alt="Emtek" class="h-5">
+                </div>
+            </div>
+            <div class="absolute top-10 right-0 w-1/2 z-0">
+                <img src="https://fabulous-happiness-c8e0dac576.media.strapiapp.com/Screenshot_2025_11_06_at_16_48_24_2088127f29.png" alt="BI-Fast App Mockup" class="w-full">
+            </div>
+        </section>
+
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-brand-dark max-w-xs leading-tight">
+                    Artikel Terbaru Kami
+                </h2>
+                
+                <div id="article-container" class="grid md:grid-cols-3 gap-8 mt-12">
+                    <p class="text-gray-600 col-span-3 text-center">Memuat artikel dari Strapi...</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-24 bg-gray-50">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+                <div><img src="https://fabulous-happiness-c8e0dac576.media.strapiapp.com/about_us_2dd617dc61.webp" alt="Pinjaman Atur Sendiri" class="w-full max-w-md mx-auto"></div>
+                <div>
+                    <h2 class="text-4xl font-bold text-brand-dark">Pinjaman Atur Sendiri (PAS)</h2>
+                    <p class="text-lg text-gray-600 mt-2">Atur Sendiri Caranya, Atur Sendiri Bayarnya</p>
+                    </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+                 <div>
+                    <h2 class="text-4xl font-bold text-brand-dark leading-tight">Banyak Untungnya, Gak Ada Ruginya!</h2>
+                    <a href="#" class="inline-block bg-brand-green text-brand-dark px-6 py-3 rounded-full font-semibold mt-8 hover:opacity-90">Cari tau</a>
+                </div>
+                <div><img src="https://fabulous-happiness-c8e0dac576.media.strapiapp.com/about_us_2dd617dc61.webp" alt="Pria memegang HP" class="w-full rounded-lg"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-brand-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-6"><p class="text-xs text-gray-500 text-center">Copyright © 2024 PT Super Bank Indonesia.</p></div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <script>
+        // URL backend Strapi LIVE Anda
+        const STRAPI_URL = "https://fabulous-happiness-c8e0dac576.strapiapp.com";
+        // const STRAPI_URL = "http://localhost:1337";
+        /**
+         * FUNGSI BARU getStrapiMedia
+         * Disederhanakan untuk menangani struktur data Anda yang 'flattened'.
+         */
+        function getStrapiMedia(media) {
+            // 'media' adalah objek 'cover' itu sendiri
+            if (!media || !media.url) {
+                return "https://placehold.co/400x250/e2e8f0/cccccc?text=No+Image";
+            }
+            
+            // Ambil 'url' langsung dari objek media
+            const { url } = media; 
+            
+            return url.startsWith('/') ? `${STRAPI_URL}${url}` : url;
+        }
+
+        /**
+         * FUNGSI BARU fetchAndDisplayArticles
+         * Disederhanakan untuk menangani struktur data Anda yang 'flattened'.
+         */
+        async function fetchAndDisplayArticles() {
+            const container = document.getElementById("article-container");
+
+            try {
+                // Panggilan API tetap sama
+                const response = await fetch(`${STRAPI_URL}/api/articles?populate=cover`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const responseData = await response.json();
+                const articles = responseData.data; // articles adalah array [ {id: ..., title: ...}, ... ]
+
+                container.innerHTML = ""; 
+
+                // Loop setiap artikel dan buat HTML-nya
+                articles.forEach(article => {
+                    // MENGHAPUS 'const attrs = article.attributes;'
+                    
+                    const card = document.createElement("div");
+                    card.className = "border border-gray-200 rounded-2xl overflow-hidden shadow-sm";
+                    
+                    // LANGSUNG GUNAKAN 'article.cover', 'article.title', dll.
+                    card.innerHTML = `
+                        <img src="${getStrapiMedia(article.cover)}" alt="${article.title || 'Gambar Artikel'}" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold">${article.title}</h3>
+                            <p class="text-gray-600 mt-2 text-sm leading-relaxed">
+                                ${article.description}
+                            </p>
+                            <a href="artikel.html?slug=${article.slug}" class="inline-block text-brand-green font-semibold mt-4 hover:underline">
+                                Baca Selengkapnya
+                            </a>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+
+                if (articles.length === 0) {
+                     container.innerHTML = `<p class="text-gray-600 col-span-3 text-center">Belum ada artikel yang dipublikasi.</p>`;
+                }
+
+            } catch (error) {
+                console.error("Gagal mengambil data dari Strapi:", error);
+                // Tampilkan error teknisnya di console untuk debugging
+                console.error(error); 
+                container.innerHTML = `<p class="text-red-500 col-span-3 text-center">Gagal memuat artikel. Lihat console (F12) untuk detail error.</p>`;
+            }
+        }
+        
+
+        // Jalankan fungsi di atas saat halaman selesai dimuat
+        document.addEventListener("DOMContentLoaded", fetchAndDisplayArticles);
+
+        // Di dalam script fetch Anda:
+
+        // Di dalam script fetch Anda:
+        const STRAPI_URL1 = "http://localhost:1337";
+        async function fetchGlobalData() {
+            try {
+                // 
+                // --- INI PERBAIKANNYA ---
+                //
+                // URL LAMA yang GAGAL:
+                // const response = await fetch(`${STRAPI_URL}/api/global?populate=deep`);
+                //
+                // URL BARU yang BENAR:
+                const response = await fetch(`${STRAPI_URL1}/api/global?populate[navigation_links][populate]=sub_links`);
+                //
+                // --- BATAS PERBAIKAN ---
+                // 
+
+                if (!response.ok) throw new Error("Gagal ambil data global");
+                
+                const responseData = await response.json();
+                const globalData = responseData.data;
+
+                // Temukan kontainer navbar Anda (Anda perlu ID ini di HTML)
+                const navContainer = document.getElementById("navbar-links"); 
+                
+                // Cek jika globalData dan navContainer ada
+                if (globalData && navContainer) {
+                    navContainer.innerHTML = ""; // Kosongkan
+                    
+                    // Loop data navigasi dan buat HTML-nya
+                    globalData.navigation_links.forEach(navLink => {
+                        let linkHTML = "";
+                        
+                        // Cek jika punya sub_links (untuk dropdown)
+                        if (navLink.sub_links && navLink.sub_links.length > 0) {
+                            // Buat HTML untuk dropdown
+                            // (Pastikan kelas CSS "dropdown", "dropdown-menu" sudah Anda atur)
+                            linkHTML = `
+                                <li class="relative dropdown">
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime flex items-center">
+                                        ${navLink.label} <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            `;
+                            
+                            navLink.sub_links.forEach(subLink => {
+                                linkHTML += `<a href="${subLink.url}" class="block px-4 py-2 text-sm text-brand-dark hover:bg-gray-100">${subLink.label}</a>`;
+                            });
+                            
+                            linkHTML += `</div></li>`;
+                            
+                        } else {
+                            // Buat HTML untuk link biasa
+                            linkHTML = `
+                                <li>
+                                    <a href="${navLink.url}" class="text-sm font-medium hover:text-brand-lime">${navLink.label}</a>
+                                </li>
+                            `;
+                        }
+                        
+                        navContainer.innerHTML += linkHTML;
+                    });
+
+                    // Panggil lucide.createIcons() lagi setelah menambah HTML baru
+                    lucide.createIcons();
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat navigasi:", error);
+            }
+        }
+
+        // Panggil fungsi ini saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", fetchGlobalData);
+    </script>
+
+</body>
+</html>
